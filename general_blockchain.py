@@ -5,21 +5,26 @@
 import datetime
 import hashlib
 import json
+from urllib.parse import urlparse
+import requests
 
 
 class GeneralBlockchain:
     def __init__(self):
         self.chain = []
+        self.transactions = []
         self.gen_block(nonce = 1, prev_hash = '0')
+        self.nodes = set()
         
     def gen_block(self, nonce, prev_hash):
         block = { 
             'index': len(self.chain) + 1,
             'timestamp': str(datetime.datetime.now()),
             'nonce': nonce,
-            'prev_hash': prev_hash
-            
+            'prev_hash': prev_hash,
+            'transactions': self.transactions       
             }
+        self.transactions = []
         self.chain.append(block)
         return block
     
@@ -60,10 +65,54 @@ class GeneralBlockchain:
                 return False
             prev_block = current_block
             block_index += 1
-        return True    
+        return True
+
+    def add_transaction(self, sender, receiver, amount):
+        self.transactions.append({
+            'sender':sender, 
+            'receiver': receiver,
+            'amount': amount
+            })
+        prev_block = self.get_last_block()
+        return prev_block['index'] + 1
     
-
-
+# nodes
+    def add_node(self, address):
+        parsed_url = urlparse(address)
+        self.nodes.add(parsed_url.netloc)
+        
+    
+    def replace_chain(self):
+        network = self.nodes
+        longest_chain = None
+        max_length = len(self.chain)
+        
+        for node in network:
+            resp = requests.get(f'http://{node}/chain')
+            if resp.status_code == 200:
+                length_chain_in_response= resp.json()['length']
+                chain_in_response = resp.json()['chain']
+                if self.is_valid_chain(chain_in_response) and length_chain_in_response > max_length:
+                    max_length = length_chain_in_response
+                    longest_chain = chain_in_response
+        if longest_chain:
+            self.chain = longest_chain
+            return True
+        
+        return False
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
             
             
