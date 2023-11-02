@@ -20,7 +20,7 @@ def mine_block():
     
     new_nonce = general_blockchain.proof_of_work(last_nonce)
     prev_hash = general_blockchain.hash_block(last_block)
-    general_blockchain.add_transaction(sender = uid_nnode_address, receiver = 'MoD', amount = 100)
+    general_blockchain.add_transaction(sender = uid_nnode_address, receiver = 'Person_Two', amount = 20)
     new_block = general_blockchain.gen_block(new_nonce, prev_hash)
     
     
@@ -47,9 +47,9 @@ def get_chain():
 def is_valid_chain():
     is_valid = general_blockchain.is_valid_chain(general_blockchain.chain)
     if is_valid:
-        response = {'message': 'Blockchain is valid'}
+        response = {'message': 'Blockchain is valid', 'valid_chain': is_valid}
     else:
-        response = {'message': 'Blockchain is Not valid'}
+        response = {'message': 'Blockchain is Not valid', 'valid_chain': is_valid}
         
     return jsonify(response), 200    
 
@@ -67,7 +67,7 @@ def add_transaction():
 @app.route('/connect_node', methods=['POST'])
 def connect_node():
     payload = request.get_json()      
-    nodes = payload.get ('node')
+    nodes = payload.get ('nodes')
     if nodes is None:
         return "No node is running"  , 400
     for node in nodes:
@@ -88,7 +88,7 @@ def consensus_replace_chain():
         
 
 #run App
-app.run(host = '0.0.0.0', port = 8001)
+app.run(host = '0.0.0.0', port = 8003)
     
     
     

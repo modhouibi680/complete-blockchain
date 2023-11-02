@@ -47,9 +47,9 @@ def get_chain():
 def is_valid_chain():
     is_valid = general_blockchain.is_valid_chain(general_blockchain.chain)
     if is_valid:
-        response = {'message': 'Blockchain is valid'}
+        response = {'message': 'Blockchain is valid', 'valid_chain': is_valid}
     else:
-        response = {'message': 'Blockchain is Not valid'}
+        response = {'message': 'Blockchain is Not valid', 'valid_chain': is_valid}
         
     return jsonify(response), 200    
 
@@ -67,7 +67,7 @@ def add_transaction():
 @app.route('/connect_node', methods=['POST'])
 def connect_node():
     payload = request.get_json()      
-    nodes = payload.get ('node')
+    nodes = payload.get ('nodes')
     if nodes is None:
         return "No node is running"  , 400
     for node in nodes:
